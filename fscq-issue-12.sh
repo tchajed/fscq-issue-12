@@ -6,7 +6,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 FSCQ=$HOME/fscq
 
 start_fscq() {
-  "$FSCQ"/src/fscq "$FSCQ"/disk.img -f -o big_writes,atomic_o_trunc,use_ino "$1" &
+  "$FSCQ"/src/fscq "$FSCQ"/src/disk.img -f -o big_writes,atomic_o_trunc,use_ino "$1" &
   sleep 0.5
 }
 
@@ -22,7 +22,10 @@ check_fscq() {
 
 mkdir -p /tmp/fscqmnt /tmp/fscqmnt2
 gcc "$DIR"/fscq-test.c -o "$DIR"/fscq-test
-cp "$FSCQ"/src/empty.img "$FSCQ"/src/disk.img
+if [ ! -f /tmp/empty.img ]; then
+  "$FSCQ"/src/mkfs /tmp/empty.img
+fi
+cp /tmp/empty.img "$FSCQ"/src/disk.img
 
 start_fscq /tmp/fscqmnt
 "$DIR"/fscq-test
